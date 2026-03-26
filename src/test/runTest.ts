@@ -1,6 +1,6 @@
 import path from 'path';
 
-import { ConsoleReporter, runTests } from '@vscode/test-electron';
+import { runTests } from '@vscode/test-electron';
 
 async function main() {
 	try {

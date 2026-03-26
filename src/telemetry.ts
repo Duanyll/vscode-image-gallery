@@ -23,9 +23,7 @@ export class ExtensionReporter extends TelemetryReporter {
         public readonly enableTelemetry: boolean = getUserTelemetrySetting(),
         private readonly instrumentationKey = "a5e759de-afbd-4f36-a9c9-2fc95385683b",
     ) {
-        const extId = utils.packageJSON.publisher + '.' + utils.packageJSON.name;
-        const extVersion = utils.packageJSON.version;
-        super(extId, extVersion, instrumentationKey);
+        super(instrumentationKey);
     }
 
 
