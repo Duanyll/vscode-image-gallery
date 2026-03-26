@@ -39,6 +39,7 @@ export function deactivate() {
 class GalleryWebview {
 	private gFolders: Record<string, TFolder> = {};
 	private customSorter: CustomSorter = new CustomSorter();
+	private galleryFolder?: vscode.Uri;
 
 	constructor(private readonly context: vscode.ExtensionContext) { }
 
@@ -57,6 +58,7 @@ class GalleryWebview {
 	}
 
 	public async createPanel(galleryFolder?: vscode.Uri) {
+		this.galleryFolder = galleryFolder;
 		const startTime = Date.now();
 		vscode.commands.executeCommand('setContext', 'ext.viewType', 'gryc.gallery');
 		const panel = vscode.window.createWebviewPanel(
@@ -87,8 +89,9 @@ class GalleryWebview {
 		return panel;
 	}
 
-	public messageListener(message: Record<string, any>, webview: vscode.Webview) {
+	public async messageListener(message: Record<string, any>, webview: vscode.Webview) {
 		const telemetryPrefix = "gallery.messageListener";
+		const isRefresh = message.command === "POST.gallery.requestRefresh";
 		switch (message.command) {
 			case "POST.gallery.openImageViewer":
 				vscode.commands.executeCommand(
@@ -104,6 +107,11 @@ class GalleryWebview {
 					'preview': message.preview.toString(),
 				});
 				break;
+
+			case "POST.gallery.requestRefresh":
+				const refreshUris = await this.getImageUris(this.galleryFolder);
+				this.gFolders = await utils.getFolders(refreshUris);
+			// fall through to requestSort -> requestContentDOMs
 
 			case "POST.gallery.requestSort":
 				this.gFolders = this.customSorter.sort(this.gFolders, message.valueName, message.ascending);
@@ -135,6 +143,10 @@ class GalleryWebview {
 					command: "POST.gallery.responseContentDOMs",
 					content: JSON.stringify(response),
 				});
+				if (isRefresh) {
+					webview.postMessage({ command: "POST.gallery.refreshComplete" });
+					vscode.window.setStatusBarMessage("Gallery refreshed.", 2000);
+				}
 				const imageSizeStat = utils.getImageSizeStat(this.gFolders);
 				reporter.sendTelemetryEvent(`${telemetryPrefix}.requestContentDOMs`, {}, {
 					"folderCount": Object.keys(this.gFolders).length,

@@ -29,6 +29,11 @@ function initMessageListeners() {
 				DOMManager.updateGlobalDoms(message);
 				DOMManager.updateGalleryContent();
 				break;
+			case "POST.gallery.refreshComplete":
+				const btn = document.querySelector(".toolbar .refresh-all");
+				btn.classList.remove("refreshing");
+				btn.disabled = false;
+				break;
 		}
 	});
 }
@@ -153,6 +158,14 @@ class EventListener {
 		);
 		document.querySelector(".toolbar .expand-all").addEventListener(
 			"click", () => EventListener.expandAllFolderBars()
+		);
+		document.querySelector(".toolbar .refresh-all").addEventListener(
+			"click", () => {
+				const btn = document.querySelector(".toolbar .refresh-all");
+				btn.classList.add("refreshing");
+				btn.disabled = true;
+				vscode.postMessage({ command: "POST.gallery.requestRefresh" });
+			}
 		);
 		document.querySelector(".toolbar .dropdown").addEventListener(
 			"change", () => EventListener.sortRequest()

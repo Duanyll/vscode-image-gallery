@@ -18,6 +18,7 @@ export default class HTMLProvider {
 		this.codicons = {
 			"expandAll": asWebviewUri("assets", "expand-all.svg"),
 			"collapseAll": asWebviewUri("assets", "collapse-all.svg"),
+			"refresh": asWebviewUri("assets", "refresh.svg"),
 			"arrowUp": asWebviewUri("assets", "arrow-up.svg"),
 			"arrowDown": asWebviewUri("assets", "arrow-down.svg"),
 			"chevronRight": asWebviewUri("assets", "chevron-right.svg"),
@@ -70,6 +71,9 @@ export default class HTMLProvider {
 				</button>
 				<button class="codicon collapse-all">
 					<img src="${this.codicons["collapseAll"]}" alt="Collapse All"/>
+				</button>
+				<button class="codicon refresh-all" title="Refresh gallery">
+					<img src="${this.codicons["refresh"]}" alt="Refresh" />
 				</button>
 			</div>
 			<div class="sort-options">
