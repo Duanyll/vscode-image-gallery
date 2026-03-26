@@ -7,8 +7,12 @@ export default class HTMLProvider {
 	codicons: Record<string, vscode.Uri>;
 	jsFileUri: vscode.Uri;
 	cssFileUri: vscode.Uri;
+	thumbnailEnabled: boolean;
+	waitForThumbnail: boolean;
 
-	constructor(private readonly context: vscode.ExtensionContext, private webview: vscode.Webview) {
+	constructor(private readonly context: vscode.ExtensionContext, private webview: vscode.Webview, thumbnailEnabled = false, waitForThumbnail = true) {
+		this.thumbnailEnabled = thumbnailEnabled;
+		this.waitForThumbnail = waitForThumbnail;
 		this.webview = webview;
 
 		const asWebviewUri = (...args: string[]) => webview.asWebviewUri(
@@ -58,7 +62,7 @@ export default class HTMLProvider {
 	bodyHTML() {
 		let htmlContents: Array<string> = [];
 		htmlContents.push(this.toolbarHTML());
-		htmlContents.push(`<div class="gallery-content"></div>`);
+		htmlContents.push(`<div class="gallery-content" data-wait-for-thumbnail="${this.waitForThumbnail}" data-thumbnail-enabled="${this.thumbnailEnabled}"></div>`);
 		return htmlContents.join('\n').trim();
 	}
 
@@ -137,23 +141,33 @@ export default class HTMLProvider {
 		`.trim();
 	}
 
-	singleImageHTML(image: TImage) {
-		const metadata = {
+	singleImageHTML(image: TImage, thumbnailUri?: vscode.Uri, dimensions?: { width: number; height: number } | null) {
+		const metadata: Record<string, any> = {
 			ext: image.ext,
 			size: image.size,
 			mtime: image.mtime,
 			ctime: image.ctime,
 		};
+		if (dimensions) {
+			metadata.width = dimensions.width;
+			metadata.height = dimensions.height;
+		}
+		const originalSrc = this.webview.asWebviewUri(image.uri);
+		const dataSrc = thumbnailUri
+			? this.webview.asWebviewUri(thumbnailUri)
+			: originalSrc;
+		const pendingClass = (this.thumbnailEnabled && !thumbnailUri) ? ' thumbnail-pending' : '';
 		return `
 		<div class="image-container">
 			<span id="${image.id}-tooltip" class="tooltip-text"></span>
 			<img
 				id="${image.id}"
 				src="${this.placeholderUri}"
-				data-src="${this.webview.asWebviewUri(image.uri)}"
+				data-src="${dataSrc}"
+				data-original-src="${originalSrc}"
 				data-path="${image.uri.path}"
 				data-meta='${JSON.stringify(metadata)}'
-				class="image unloaded"
+				class="image unloaded${pendingClass}"
 			>
 			<div id="${image.id}-filename" class="filename">${utils.getFilename(image.uri.path)}</div>
 		</div>

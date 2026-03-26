@@ -4,6 +4,7 @@
 out/**
 src/test/**
 node_modules/**
+!node_modules/wasm-vips/**
 src/**/*.ts
 .gitignore
 .yarnrc
@@ -17,3 +18,4 @@ vsc-extension-quickstart.md
 docs/**
 !docs/logo-128.png
 images/**
+*.vsix

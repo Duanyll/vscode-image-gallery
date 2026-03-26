@@ -18,4 +18,14 @@ declare module 'custom_typings' {
             [imageId: string]: TImage,
         },
     };
+
+    export type ThumbnailConfig = {
+        enabled: 'always' | 'remote' | 'never',
+        maxSize: number,
+        quality: number,
+        format: 'webp' | 'jpeg',
+        diskCacheSizeMB: number,
+        skipFormats: string[],
+        waitForThumbnail: boolean,
+    };
 }

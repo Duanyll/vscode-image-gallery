@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
 import * as utils from '../utils';
-import { TFolder } from 'custom_typings';
+import { TFolder, ThumbnailConfig } from 'custom_typings';
 import CustomSorter from './sorter';
 import HTMLProvider from '../html_provider';
 import { reporter } from '../telemetry';
+import { ThumbnailService, readThumbnailConfig } from '../thumbnail';
 
 export let disposable: vscode.Disposable;
 
@@ -21,12 +22,22 @@ export function activate(context: vscode.ExtensionContext) {
 			const fileWatcher = gallery.createFileWatcher(panel.webview, galleryFolder);
 			context.subscriptions.push(fileWatcher);
 			panel.onDidDispose(
-				() => fileWatcher.dispose(),
+				() => {
+					fileWatcher.dispose();
+					gallery.dispose();
+				},
 				undefined,
 				context.subscriptions,
 			);
 	});
 	context.subscriptions.push(disposable);
+
+	const clearCacheDisposable = vscode.commands.registerCommand('gryc.clearThumbnailCache', async () => {
+		await gallery.clearThumbnailCache();
+		vscode.window.setStatusBarMessage("Thumbnail cache cleared.", 3000);
+	});
+	context.subscriptions.push(clearCacheDisposable);
+
 	reporter.sendTelemetryEvent('gallery.activate');
 }
 
@@ -40,8 +51,13 @@ class GalleryWebview {
 	private gFolders: Record<string, TFolder> = {};
 	private customSorter: CustomSorter = new CustomSorter();
 	private galleryFolder?: vscode.Uri;
+	private thumbnailService: ThumbnailService;
+	private thumbnailConfig: ThumbnailConfig;
 
-	constructor(private readonly context: vscode.ExtensionContext) { }
+	constructor(private readonly context: vscode.ExtensionContext) {
+		this.thumbnailConfig = readThumbnailConfig();
+		this.thumbnailService = new ThumbnailService(context, this.thumbnailConfig);
+	}
 
 	private async getImageUris(galleryFolder?: vscode.Uri | string) {
 		/**
@@ -61,6 +77,7 @@ class GalleryWebview {
 		this.galleryFolder = galleryFolder;
 		const startTime = Date.now();
 		vscode.commands.executeCommand('setContext', 'ext.viewType', 'gryc.gallery');
+		const thumbnailCacheDir = vscode.Uri.joinPath(this.context.globalStorageUri, 'thumbnails');
 		const panel = vscode.window.createWebviewPanel(
 			'gryc.gallery',
 			`Image Gallery${galleryFolder ? ': ' + utils.getFilename(galleryFolder.path) : ''}`,
@@ -68,10 +85,16 @@ class GalleryWebview {
 			{
 				enableScripts: true,
 				retainContextWhenHidden: true,
+				localResourceRoots: [
+					this.context.extensionUri,
+					thumbnailCacheDir,
+					...(vscode.workspace.workspaceFolders?.map(f => f.uri) ?? []),
+					...(galleryFolder ? [galleryFolder] : []),
+				],
 			}
 		);
 
-		const htmlProvider = new HTMLProvider(this.context, panel.webview);
+		const htmlProvider = new HTMLProvider(this.context, panel.webview, this.thumbnailService.effectivelyEnabled, this.thumbnailConfig.waitForThumbnail);
 		const imageUris = await this.getImageUris(galleryFolder);
 		this.gFolders = await utils.getFolders(imageUris);
 		this.gFolders = this.customSorter.sort(this.gFolders);
@@ -122,21 +145,34 @@ class GalleryWebview {
 			// DO NOT BREAK HERE; FALL THROUGH TO UPDATE DOMS
 
 			case "POST.gallery.requestContentDOMs":
-				const htmlProvider = new HTMLProvider(this.context, webview);
+				const htmlProvider = new HTMLProvider(this.context, webview, this.thumbnailService.effectivelyEnabled, this.thumbnailConfig.waitForThumbnail);
 				const response: Record<string, any> = {};
+				const uncachedImages: import('custom_typings').TImage[] = [];
+
 				for (const [_idx, folder] of Object.values(this.gFolders).entries()) {
+					const imageEntries: [string, any][] = [];
+					for (const image of Object.values(folder.images)) {
+						let thumbnailUri: vscode.Uri | undefined;
+						let dimensions: { width: number; height: number } | null | undefined;
+						if (this.thumbnailService.effectivelyEnabled) {
+							const cached = await this.thumbnailService.getCachedEntry(image);
+							if (cached) {
+								thumbnailUri = cached.uri;
+								dimensions = cached.dimensions;
+							} else {
+								uncachedImages.push(image);
+							}
+						}
+						imageEntries.push([image.id, {
+							status: image.status,
+							containerHtml: htmlProvider.singleImageHTML(image, thumbnailUri, dimensions),
+						}]);
+					}
 					response[folder.id] = {
 						status: "",
 						barHtml: htmlProvider.folderBarHTML(folder),
 						gridHtml: htmlProvider.imageGridHTML(folder, true),
-						images: Object.fromEntries(
-							Object.values(folder.images).map(
-								image => [image.id, {
-									status: image.status,
-									containerHtml: htmlProvider.singleImageHTML(image),
-								}]
-							)
-						),
+						images: Object.fromEntries(imageEntries),
 					};
 				}
 				webview.postMessage({
@@ -154,6 +190,22 @@ class GalleryWebview {
 					"imageSizeMean": imageSizeStat.mean,
 					"imageSizeStd": imageSizeStat.std,
 				});
+
+				// Generate thumbnails for uncached images in background
+				if (this.thumbnailService.effectivelyEnabled && uncachedImages.length > 0) {
+					this.thumbnailService.generateBatch(
+						uncachedImages,
+						webview,
+						(imageId, thumbnailSrc, dimensions) => {
+							webview.postMessage({
+								command: "POST.gallery.thumbnailReady",
+								imageId,
+								thumbnailSrc,
+								dimensions,
+							});
+						},
+					);
+				}
 				break;
 		}
 	}
@@ -185,6 +237,7 @@ class GalleryWebview {
 			reporter.sendTelemetryEvent(`${telemetryPrefix}.didCreate`, {}, getMeasurementProperties(folders));
 		});
 		watcher.onDidDelete(async uri => {
+			this.thumbnailService.invalidate(uri.path);
 			const folders = await utils.getFolders([uri], "delete");
 			const folder = Object.values(folders)[0];
 			const imageId = utils.hash256(webview.asWebviewUri(uri).path);
@@ -202,6 +255,7 @@ class GalleryWebview {
 		watcher.onDidChange(async uri => {
 			// rename is NOT handled here; it's handled automatically by Delete & Create
 			// hence we can assume imageId and folderId to be the same
+			this.thumbnailService.invalidate(uri.path);
 			const folders = await utils.getFolders([uri], "change");
 			const folder = Object.values(folders)[0];
 			const image = Object.values(folder.images)[0];
@@ -214,5 +268,13 @@ class GalleryWebview {
 			reporter.sendTelemetryEvent(`${telemetryPrefix}.didChange`, {}, getMeasurementProperties(folders));
 		});
 		return watcher;
+	}
+
+	public async clearThumbnailCache() {
+		await this.thumbnailService.clearCache();
+	}
+
+	public dispose() {
+		this.thumbnailService.dispose();
 	}
 }

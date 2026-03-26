@@ -67,6 +67,55 @@
 					"type": "string",
 					"default": null,
 					"markdownDescription": "Variant collations for certain locales. Possible values include:\n- \"`compat`\" - Arabic\n- \"`dict`\" - Sinhala\n- \"`emoji`\" - root\n- \"`eor`\" - root\n- \"`phonebk`\" - German\n- \"`phonetic`\" - Lingala\n- \"`pinyin`\" - Chinese\n- \"`reformed`\" - Swedish\n- \"`stroke`\" - Chinese\n- \"`trad`\"\n- \"`zhuyin`\" - Chinese"
+				},
+				"imageGallery.thumbnail.enabled": {
+					"type": "string",
+					"default": "remote",
+					"enum": ["always", "remote", "never"],
+					"enumDescriptions": [
+						"Always generate thumbnails",
+						"Only generate thumbnails in remote sessions (SSH, WSL, Containers, etc.)",
+						"Never generate thumbnails, always load original images"
+					],
+					"markdownDescription": "When to enable backend thumbnail compression."
+				},
+				"imageGallery.thumbnail.maxSize": {
+					"type": "number",
+					"default": 512,
+					"minimum": 50,
+					"maximum": 800,
+					"markdownDescription": "Maximum width/height of generated thumbnails in pixels."
+				},
+				"imageGallery.thumbnail.quality": {
+					"type": "number",
+					"default": 80,
+					"minimum": 1,
+					"maximum": 100,
+					"markdownDescription": "Compression quality for thumbnails (1-100)."
+				},
+				"imageGallery.thumbnail.format": {
+					"type": "string",
+					"default": "webp",
+					"enum": ["webp", "jpeg"],
+					"markdownDescription": "Output format for thumbnails. WebP offers better compression."
+				},
+				"imageGallery.thumbnail.diskCacheSizeMB": {
+					"type": "number",
+					"default": 200,
+					"minimum": 10,
+					"maximum": 2000,
+					"markdownDescription": "Maximum disk cache size for thumbnails in MB."
+				},
+				"imageGallery.thumbnail.skipFormats": {
+					"type": "array",
+					"default": ["svg"],
+					"items": { "type": "string" },
+					"markdownDescription": "File formats to skip thumbnail generation for (served as-is). Add `gif` to preserve animations."
+				},
+				"imageGallery.thumbnail.waitForThumbnail": {
+					"type": "boolean",
+					"default": true,
+					"markdownDescription": "When `true`, show placeholder until thumbnail is ready (saves bandwidth). When `false`, load original image immediately for faster visual feedback."
 				}
 			}
 		},
@@ -86,6 +135,11 @@
 			{
 				"command": "gryc.openGallery",
 				"title": "Open Image Gallery",
+				"category": "Image Gallery"
+			},
+			{
+				"command": "gryc.clearThumbnailCache",
+				"title": "Clear Thumbnail Cache",
 				"category": "Image Gallery"
 			}
 		],
@@ -123,9 +177,9 @@
 		"@vscode/test-electron": "^2.5.2",
 		"@vscode/test-web": "^0.0.80",
 		"@vscode/vsce": "^3.7.1",
+		"chai": "^4.5.0",
 		"eslint": "^8.57.1",
 		"glob": "^10.5.0",
-		"chai": "^4.5.0",
 		"mocha": "^10.8.2",
 		"ts-loader": "^9.5.4",
 		"typescript": "^5.9.3",
@@ -134,6 +188,7 @@
 	},
 	"dependencies": {
 		"@vscode/extension-telemetry": "^0.9.7",
-		"panzoom": "^9.4.4"
+		"panzoom": "^9.4.4",
+		"wasm-vips": "^0.0.17"
 	}
 }

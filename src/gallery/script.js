@@ -34,6 +34,9 @@ function initMessageListeners() {
 				btn.classList.remove("refreshing");
 				btn.disabled = false;
 				break;
+			case "POST.gallery.thumbnailReady":
+				ThumbnailManager.onThumbnailReady(message.imageId, message.thumbnailSrc, message.dimensions);
+				break;
 		}
 	});
 }
@@ -43,13 +46,60 @@ const imageObserver = new IntersectionObserver(
 		entries.forEach(entry => {
 			if (entry.isIntersecting) {
 				const image = entry.target;
+				const galleryContent = document.querySelector(".gallery-content");
+				const waitForThumbnail = galleryContent && galleryContent.dataset.waitForThumbnail === "true";
+				const thumbnailEnabled = galleryContent && galleryContent.dataset.thumbnailEnabled === "true";
+
+				// If thumbnail is pending and waitForThumbnail is on, skip loading for now
+				if (thumbnailEnabled && waitForThumbnail && image.classList.contains("thumbnail-pending")) {
+					return;
+				}
+
 				imageObserver.unobserve(image);
-				image.src = image.dataset.src;
+
+				// If thumbnail not ready but waitForThumbnail is off, load original
+				if (thumbnailEnabled && !waitForThumbnail && image.classList.contains("thumbnail-pending")) {
+					image.src = image.dataset.originalSrc;
+				} else {
+					image.src = image.dataset.src;
+				}
 				image.onload = () => image.classList.replace("unloaded", "loaded");
 			}
 		});
 	}
 );
+
+class ThumbnailManager {
+	static onThumbnailReady(imageId, thumbnailSrc, dimensions) {
+		const img = document.getElementById(imageId);
+		if (!img) { return; }
+
+		img.dataset.src = thumbnailSrc;
+		img.classList.remove("thumbnail-pending");
+
+		// Store original dimensions in data-meta so tooltip can use them
+		if (dimensions) {
+			try {
+				const meta = JSON.parse(img.dataset.meta);
+				meta.width = dimensions.width;
+				meta.height = dimensions.height;
+				img.dataset.meta = JSON.stringify(meta);
+			} catch { /* ignore */ }
+		}
+
+		// If image is still unloaded (hasn't been displayed yet), trigger load
+		if (img.classList.contains("unloaded")) {
+			// If already loaded the original (waitForThumbnail=false), don't swap
+			if (img.src && img.src !== img.dataset.src && img.classList.contains("loaded")) {
+				return;
+			}
+			// Re-observe to trigger if currently in viewport
+			imageObserver.unobserve(img);
+			imageObserver.observe(img);
+		}
+		// If already loaded (has "loaded" class), don't swap — original is already displayed
+	}
+}
 
 class FilterManager {
 	static debounceTimer = null;
@@ -362,8 +412,11 @@ class EventListener {
 		const ctimeStr = new Date(data.ctime).toLocaleString("en-US", dateOptions);
 		const mtimeStr = new Date(data.mtime).toLocaleString("en-US", dateOptions);
 
+		const dimWidth = data.width || image.naturalWidth;
+		const dimHeight = data.height || image.naturalHeight;
+
 		tooltipDOM.textContent = [
-			`Dimensions: ${image.naturalWidth} x ${image.naturalHeight}`,
+			`Dimensions: ${dimWidth} x ${dimHeight}`,
 			`Type: ${data.ext}`,
 			`Size: ${sizeStr}`,
 			`Modified: ${mtimeStr}`,
