@@ -76,6 +76,9 @@ export default class HTMLProvider {
 					<img src="${this.codicons["refresh"]}" alt="Refresh" />
 				</button>
 			</div>
+			<div class="filter-control">
+				<input type="text" id="filter-input" class="filter-input" placeholder="Filter (e.g. *.png, **/icons/*)">
+			</div>
 			<div class="sort-options">
 				<span>Sort by</span>
 				<select id="dropdown-sort" class="dropdown">

@@ -51,6 +51,105 @@ const imageObserver = new IntersectionObserver(
 	}
 );
 
+class FilterManager {
+	static debounceTimer = null;
+	static currentPattern = "";
+
+	static globToRegex(glob) {
+		if (!glob) return null;
+		let regex = "";
+		let i = 0;
+		while (i < glob.length) {
+			const c = glob[i];
+			if (c === "*") {
+				if (glob[i + 1] === "*") {
+					// ** matches across path segments
+					regex += ".*";
+					i += 2;
+					// skip trailing /
+					if (glob[i] === "/") i++;
+				} else {
+					// * matches within a single segment
+					regex += "[^/]*";
+					i++;
+				}
+			} else if (c === "?") {
+				regex += "[^/]";
+				i++;
+			} else if (".+^${}()|[]\\".includes(c)) {
+				regex += "\\" + c;
+				i++;
+			} else {
+				regex += c;
+				i++;
+			}
+		}
+		return new RegExp(regex, "i");
+	}
+
+	static apply() {
+		const input = document.getElementById("filter-input");
+		FilterManager.currentPattern = input ? input.value.trim() : "";
+		const regex = FilterManager.globToRegex(FilterManager.currentPattern);
+
+		for (const [folderId, folder] of Object.entries(gFolders)) {
+			let visibleCount = 0;
+			for (const [imageId, image] of Object.entries(folder.images)) {
+				const imgEl = image.container.querySelector("img[data-path]");
+				if (!imgEl) continue;
+				const path = imgEl.dataset.path;
+				const filename = path.split("/").pop();
+				// match against full path or just filename
+				const matches = !regex || regex.test(path) || regex.test(filename);
+				if (matches) {
+					image.container.classList.remove("filter-hidden");
+					visibleCount++;
+				} else {
+					image.container.classList.add("filter-hidden");
+				}
+			}
+
+			// hide folder if all images are filtered out
+			const totalImages = Object.keys(folder.images).length;
+			if (regex && visibleCount === 0) {
+				folder.bar.classList.add("filter-hidden");
+				folder.grid.classList.add("filter-hidden");
+			} else {
+				folder.bar.classList.remove("filter-hidden");
+				folder.grid.classList.remove("filter-hidden");
+			}
+
+			// update count to show filtered/total
+			const countEl = folder.bar.querySelector(`#${folderId}-items-count`);
+			if (countEl) {
+				if (regex && visibleCount < totalImages) {
+					countEl.textContent = `${visibleCount}/${totalImages} images`;
+				} else {
+					const countText = `${totalImages} image${totalImages === 1 ? "" : "s"} found`;
+					countEl.textContent = countText;
+				}
+			}
+		}
+
+		// update global folder count
+		const visibleFolders = Object.values(gFolders).filter(f => !f.bar.classList.contains("filter-hidden")).length;
+		const totalFolders = Object.keys(gFolders).length;
+		const folderCountEl = document.querySelector(".toolbar .folder-count");
+		if (folderCountEl) {
+			if (regex && visibleFolders < totalFolders) {
+				folderCountEl.textContent = `${visibleFolders}/${totalFolders} folders`;
+			} else {
+				folderCountEl.textContent = `${totalFolders} folder${totalFolders === 1 ? "" : "s"} found`;
+			}
+		}
+	}
+
+	static onInput() {
+		clearTimeout(FilterManager.debounceTimer);
+		FilterManager.debounceTimer = setTimeout(() => FilterManager.apply(), 300);
+	}
+}
+
 class DOMManager {
 	static htmlToDOM(html) {
 		const template = document.createElement("template");
@@ -148,6 +247,7 @@ class DOMManager {
 		if (content.childElementCount === 0) {
 			content.innerHTML = "<p>No image found in this folder.</p>";
 		}
+		FilterManager.apply();
 	}
 }
 
@@ -180,6 +280,9 @@ class EventListener {
 			"input", (event) => {
 				document.documentElement.style.setProperty('--thumbnail-size', event.target.value + 'px');
 			}
+		);
+		document.getElementById("filter-input").addEventListener(
+			"input", () => FilterManager.onInput()
 		);
 	}
 
