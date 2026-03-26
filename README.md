@@ -1,22 +1,8 @@
 # Image Gallery
 
-[![](https://github.com/geriyoco/vscode-image-gallery/actions/workflows/vsce_publish.yml/badge.svg?branch=production)](https://github.com/geriyoco/vscode-image-gallery/actions/workflows/vsce_publish.yml)
-[![](https://vsmarketplacebadge.apphb.com/version-short/geriyoco.vscode-image-gallery.svg?label=Version)](https://marketplace.visualstudio.com/items?itemName=geriyoco.vscode-image-gallery)
-[![](https://vsmarketplacebadge.apphb.com/installs-short/geriyoco.vscode-image-gallery.svg?label=Installs)](https://marketplace.visualstudio.com/items?itemName=geriyoco.vscode-image-gallery)
-[![](https://vsmarketplacebadge.apphb.com/rating-short/geriyoco.vscode-image-gallery.svg?label=Rating)](https://marketplace.visualstudio.com/items?itemName=GeriYoco.vscode-image-gallery&ssr=false#review-details)
-
 A light-weighted extension that brings you the best image browsing experience in VS Code, especially for remote / cloud development.
 
-> 📢 **Announcement** 📢 (March 12, 2024)
-> 
-> Hi Image Gallery Users,
-> 
-> We're finally getting back on track with the extension development. Here’s what we really need from you:
-> - 💻 Code Contributions: Dive into the codebase and help us by submitting pull requests. Whether it’s adding new features, or improving the existing ones, your contributions are crucial. We'll lay out a contribution guideline soon (you may contribute to this too).
-> - 💡 Feature Suggestions: We welcome your ideas to make this tool more useful, especially for those in the computer vision field, where our extension has found a significant user base. But, suggestions for features that you think would be useful for all users are welcome too.
-> - 💬 Spread the Word: Share your experience with the extension. A wider user and contributor base helps drive the project forward.
-> 
-> Looking ahead, our goal is to collaborate closely with all users, addressing your needs and incorporating valuable enhancements. However, we may have limitations on addressing all issues promptly as we have our full-time jobs during weekdays. Your patience and contributions will highly be appreciated. Lastly, thank you for your continued support.
+> This is a maintained fork of [geriyoco/vscode-image-gallery](https://github.com/geriyoco/vscode-image-gallery), which has been inactive since 2024.
 
 ## Highlights
 - **Remote**: Excellent for browsing images on a cloud (e.g. via [SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh))
@@ -31,6 +17,5 @@ A light-weighted extension that brings you the best image browsing experience in
 See [here](docs/photo_credits.md) for the photo credits.
 
 ## Like this work?
-- ⭐ Star this project on [GitHub](https://github.com/geriyoco/vscode-image-gallery) or [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=GeriYoco.vscode-image-gallery)
-- ↪️ Share it with your friends: [Twitter](https://twitter.com/intent/tweet?text=Just%20discovered%20this%20on%20the%20%23VSMarketplace%3A%20https%3A%2F%2Fmarketplace.visualstudio.com%2Fitems%3FitemName%3DGeriYoco.vscode-image-gallery), [Facebook](https://www.facebook.com/sharer/sharer.php?u=https://marketplace.visualstudio.com/items?itemName=GeriYoco.vscode-image-gallery)
-- 🖥️ Contribute to the project: Start an [issue](https://github.com/geriyoco/vscode-image-gallery/issues/new) or [fork](https://github.com/geriyoco/vscode-image-gallery/fork) the repository.
+- ⭐ Star this project on [GitHub](https://github.com/Duanyll/vscode-image-gallery) or [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=duanyll.vscode-image-gallery)
+- 🖥️ Contribute to the project: Start an [issue](https://github.com/Duanyll/vscode-image-gallery/issues/new) or [fork](https://github.com/Duanyll/vscode-image-gallery/fork) the repository.

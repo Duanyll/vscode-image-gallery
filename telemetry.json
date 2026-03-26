@@ -1,8 +1,8 @@
 {
     "events": {
-        "GeriYoco.vscode-image-gallery/gallery.activate": { },
-        "GeriYoco.vscode-image-gallery/gallery.deactivate": { },
-        "GeriYoco.vscode-image-gallery/gallery.createPanel": {
+        "duanyll.vscode-image-gallery/gallery.activate": { },
+        "duanyll.vscode-image-gallery/gallery.deactivate": { },
+        "duanyll.vscode-image-gallery/gallery.createPanel": {
             "duration": {
                 "classification": "SystemMetaData",
                 "purpose": "FeatureInsight",
@@ -29,13 +29,13 @@
                 "isMeasurement": true
             }
         },
-        "GeriYoco.vscode-image-gallery/gallery.messageListener.openImageViewer": {
+        "duanyll.vscode-image-gallery/gallery.messageListener.openImageViewer": {
             "preview": {
                 "classification": "SystemMetaData",
                 "purpose": "FeatureInsight"
             }
         },
-        "GeriYoco.vscode-image-gallery/gallery.messageListener.requestSort": {
+        "duanyll.vscode-image-gallery/gallery.messageListener.requestSort": {
             "valueName": {
                 "classification": "SystemMetaData",
                 "purpose": "FeatureInsight"
@@ -45,7 +45,7 @@
                 "purpose": "FeatureInsight"
             }
         },
-        "GeriYoco.vscode-image-gallery/gallery.messageListener.requestContentDOMs": {
+        "duanyll.vscode-image-gallery/gallery.messageListener.requestContentDOMs": {
             "folderCount": {
                 "classification": "SystemMetaData",
                 "purpose": "FeatureInsight",
@@ -67,7 +67,7 @@
                 "isMeasurement": true
             }
         },
-        "GeriYoco.vscode-image-gallery/gallery.createFileWatcher.didCreate": {
+        "duanyll.vscode-image-gallery/gallery.createFileWatcher.didCreate": {
             "folderCount": {
                 "classification": "SystemMetaData",
                 "purpose": "FeatureInsight",
@@ -79,7 +79,7 @@
                 "isMeasurement": true
             }
         },
-        "GeriYoco.vscode-image-gallery/gallery.createFileWatcher.didDelete": {
+        "duanyll.vscode-image-gallery/gallery.createFileWatcher.didDelete": {
             "folderCount": {
                 "classification": "SystemMetaData",
                 "purpose": "FeatureInsight",
@@ -91,7 +91,7 @@
                 "isMeasurement": true
             }
         },
-        "GeriYoco.vscode-image-gallery/gallery.createFileWatcher.didChange": {
+        "duanyll.vscode-image-gallery/gallery.createFileWatcher.didChange": {
             "folderCount": {
                 "classification": "SystemMetaData",
                 "purpose": "FeatureInsight",

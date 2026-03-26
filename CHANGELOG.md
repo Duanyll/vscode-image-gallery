@@ -1,12 +1,22 @@
 # Change Log
 
+## [1.3.0] - 2026-03-26
+### Changed
+- Fork republished under publisher `duanyll`
+- Upgraded all dependencies (TypeScript 5, webpack-cli 5, ESLint 8.57, @typescript-eslint 7, glob 10, mocha 10, etc.)
+- Replaced deprecated `vsce` with `@vscode/vsce`
+- Disabled telemetry (instrumentation key cleared)
+- Added thumbnail size slider and fixed tooltip positioning
+- Improved theme compatibility for toolbar, folder bars, icons, and tooltips
+- Added force refresh button to gallery toolbar
+
 ## [1.2.1] - 2022-09-28
 ### Fixed
 - Supported file extensions are now consistent between [`package.json`](package.json) and [`src/utils.ts`](src/utils.ts).
 
 ## [1.2.0] - 2022-09-21
 ### Added
-- Telemetry for feature insights. We strive to be transparent at what we collect. See [`telemetry.json`](telemetry.json) for all the events we collect. Following the [Microsoft Privacy Statement](https://privacy.microsoft.com/en-us/privacystatement), we do not collect any Personally Identifiable Information (PII). Check out the open-source repository at [here](https://github.com/geriyoco/vscode-image-gallery) to inspect the code. You can always opt-out of telemetry by setting `geriyocoImageGallery.isTelemetryEnabled` to `false` in your VS Code settings. Visit [here](https://code.visualstudio.com/docs/getstarted/telemetry) to learn more about VS Code telemetry.
+- Telemetry for feature insights. See [`telemetry.json`](telemetry.json) for the event definitions. Note: telemetry is disabled in the duanyll fork.
 
 ### Fixed
 - Image sort preference was not respected when file watcher is involved, e.g. after an image is added, deleted, or modified.

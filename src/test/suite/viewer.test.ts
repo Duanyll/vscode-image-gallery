@@ -2,7 +2,7 @@ import vscode from 'vscode';
 
 import * as utils from '../../utils';
 
-suite('GeriYoco.vscode-image-gallery: Viewer Test Suite', () => {
+suite('duanyll.vscode-image-gallery: Viewer Test Suite', () => {
 	vscode.window.showInformationMessage('Viewer Test Suite started.');
 
 	// test('viewer', async () => {

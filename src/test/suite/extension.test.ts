@@ -3,7 +3,7 @@ import { assert } from 'chai';
 
 import * as utils from '../../utils';
 
-suite('GeriYoco.vscode-image-gallery: Extension Test Suite', () => {
+suite('duanyll.vscode-image-gallery: Extension Test Suite', () => {
 	vscode.window.showInformationMessage('Start all tests.');
 
 	test('utils.nonce', () => {
