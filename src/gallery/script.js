@@ -197,8 +197,8 @@ class EventListener {
 			});
 			imageContainer.addEventListener("mouseover", () => {
 				const tooltip = image.previousElementSibling;
-				if (!tooltip.classList.contains("tooltip")) {
-					throw new Error("DOM element is not of class tooltip");
+				if (!tooltip.classList.contains("tooltip-text")) {
+					throw new Error("DOM element is not of class tooltip-text");
 				}
 				EventListener.showImageMetadata(tooltip, image.dataset.meta);
 			});

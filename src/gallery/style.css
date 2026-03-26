@@ -17,54 +17,41 @@ html {
 }
 
 .image-container {
-	overflow: hidden;
+	position: relative;
 	padding: 2%;
 	width: 100%;
 	justify-self: center;
 	border-radius: 5px;
-	background-color: none;
-	transform: translate3d(0, 0, 1px);
-	-webkit-transform: translate3d(0, 0, 1px);
-	backface-visibility: hidden;
-	-webkit-backface-visibility: hidden;
 }
 
-.tooltip {
-	position: relative;
+.image-container:hover {
+	background-color: var(--vscode-list-hoverBackground, rgba(128, 128, 128, 0.1));
 }
 
 .tooltip-text {
 	position: absolute;
-	z-index: 1;
+	z-index: 100;
+	bottom: 0;
+	left: 0;
+	right: 0;
 	visibility: hidden;
 	opacity: 0;
-	transition: 0s opacity;
-	width: 100%;
-	background-color: black;
-	color: #fff;
+	transition: opacity 0.1s;
+	background-color: var(--vscode-editorHoverWidget-background, rgba(37, 37, 38, 0.95));
+	color: var(--vscode-editorHoverWidget-foreground, #cccccc);
+	border-top: 1px solid var(--vscode-editorHoverWidget-border, #454545);
 	text-align: left;
-	padding: 10px;
-	border-radius: 6px;
+	padding: 4px 8px;
+	font-size: 12px;
+	line-height: 1.5;
 	white-space: pre;
+	pointer-events: none;
 }
 
-.tooltip:hover .tooltip-text {
-	opacity: 0.8;
+.image-container:hover .tooltip-text {
+	opacity: 1;
 	visibility: visible;
-	transition-delay: 1s;
-}
-
-button.codicon+.tooltip-text {
-	width: auto;
-	transform: translate(5rem, 1.8rem);
-	background-color: hsl(240, 1%, 14%);
-	padding: 6px;
-	border-radius: 0px;
-	border: 2px solid white;
-}
-
-.image-container:hover {
-	box-shadow: 0 0 10px white;
+	transition-delay: 0.5s;
 }
 
 .image {
@@ -95,16 +82,18 @@ button.codicon+.tooltip-text {
 
 .folder {
 	margin-top: 5px;
-	padding: 15px;
+	padding: 6px 10px;
 	display: flex;
+	align-items: center;
 	width: 100%;
-	background-color: hsl(0, 0%, 17%);
-	color: white;
+	background-color: var(--vscode-sideBarSectionHeader-background, hsl(0, 0%, 17%));
+	color: var(--vscode-sideBarSectionHeader-foreground, inherit);
 	border: 0;
+	border-top: 1px solid var(--vscode-sideBarSectionHeader-border, transparent);
 }
 
 .folder:hover {
-	box-shadow: 0 0px 10px hsl(60, 65%, 90%);
+	background-color: var(--vscode-list-hoverBackground, hsl(0, 0%, 21%));
 }
 
 .folder-title {
@@ -114,7 +103,8 @@ button.codicon+.tooltip-text {
 }
 
 .folder-arrow {
-	margin-top: -2px;
+	display: flex;
+	align-items: center;
 }
 
 .folder-count {
@@ -122,7 +112,7 @@ button.codicon+.tooltip-text {
 	flex-grow: 1;
 	justify-content: right;
 	align-items: center;
-	color: white;
+	color: var(--vscode-descriptionForeground, inherit);
 	font-family: arial;
 }
 
@@ -130,10 +120,12 @@ button.codicon+.tooltip-text {
 	position: sticky;
 	z-index: 1000;
 	top: 0;
-	padding: 15px;
+	padding: 6px 10px;
 	display: flex;
+	align-items: center;
 	flex-grow: 1;
-	background-color: hsl(0, 0%, 17%);
+	background-color: var(--vscode-editor-background, hsl(0, 0%, 17%));
+	border-bottom: 1px solid var(--vscode-panel-border, transparent);
 }
 
 .toolbar-item {
@@ -145,12 +137,24 @@ button.codicon+.tooltip-text {
 .codicon {
 	padding: 3px;
 	border: 0;
-	background-color: hsl(0, 0%, 17%);
-	color: white;
+	background-color: transparent;
+	color: var(--vscode-icon-foreground, inherit);
+}
+
+.codicon img,
+.folder-arrow img {
+	filter: none;
+}
+
+body.vscode-dark .codicon img,
+body.vscode-dark .folder-arrow img,
+body.vscode-high-contrast .codicon img,
+body.vscode-high-contrast .folder-arrow img {
+	filter: invert(1);
 }
 
 .codicon:hover {
-	background-color: hsl(180, 0%, 21%);
+	background-color: var(--vscode-toolbar-hoverBackground, rgba(128, 128, 128, 0.2));
 	border-radius: 5px;
 }
 
@@ -162,28 +166,22 @@ button.codicon+.tooltip-text {
 }
 
 .sort-options span {
-	font-size: 15px;
+	font-size: 13px;
 	margin-left: 10px;
 	margin-right: 10px;
-	align-items: center;
-	justify-content: center;
+	color: var(--vscode-foreground, inherit);
 }
 
 .dropdown {
-	padding: 6px;
-	background-color: hsl(0, 0%, 23%);
-	color: white;
-	border-width: 0px;
-}
-
-.dropdown:checked {
-	border-width: 0px;
+	padding: 4px;
+	background-color: var(--vscode-dropdown-background, hsl(0, 0%, 23%));
+	color: var(--vscode-dropdown-foreground, inherit);
+	border: 1px solid var(--vscode-dropdown-border, transparent);
 }
 
 select option {
-	background-color: hsl(0, 0%, 23%);
-	color: white;
-	border-radius: 0px;
+	background-color: var(--vscode-dropdown-listBackground, var(--vscode-dropdown-background, hsl(0, 0%, 23%)));
+	color: var(--vscode-dropdown-foreground, inherit);
 }
 
 .refresh-all.refreshing img {

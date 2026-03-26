@@ -138,8 +138,8 @@ export default class HTMLProvider {
 			ctime: image.ctime,
 		};
 		return `
-		<div class="image-container tooltip">
-			<span id="${image.id}-tooltip" class="tooltip tooltip-text"></span>
+		<div class="image-container">
+			<span id="${image.id}-tooltip" class="tooltip-text"></span>
 			<img
 				id="${image.id}"
 				src="${this.placeholderUri}"
