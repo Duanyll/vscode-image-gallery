@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.4.0] - 2026-03-26
+### Added
+- Backend thumbnail compression with wasm-vips for remote bandwidth optimization
+- Glob filter search box to gallery toolbar
+
 ## [1.3.0] - 2026-03-26
 ### Changed
 - Fork republished under publisher `duanyll`

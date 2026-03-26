@@ -2,7 +2,7 @@
 	"name": "image-gallery",
 	"displayName": "Image Gallery Plus",
 	"description": "Improve image browsing experience, especially for remote development.",
-	"version": "1.3.0",
+	"version": "1.4.0",
 	"publisher": "duanyll",
 	"repository": {
 		"type": "git",
@@ -29,9 +29,7 @@
 		"visualization"
 	],
 	"activationEvents": [
-		"onCommand:gryc.openGallery",
-		"onWebviewPanel:gryc.gallery",
-		"onCustomEditor:gryc.viewer"
+		"onWebviewPanel:gryc.gallery"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
