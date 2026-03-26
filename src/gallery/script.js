@@ -176,6 +176,11 @@ class EventListener {
 				EventListener.sortRequest();
 			}
 		);
+		document.querySelector("#thumbnail-size-slider").addEventListener(
+			"input", (event) => {
+				document.documentElement.style.setProperty('--thumbnail-size', event.target.value + 'px');
+			}
+		);
 	}
 
 	static addToFolderBar(folderBar) {
@@ -195,15 +200,29 @@ class EventListener {
 			imageContainer.addEventListener("dblclick", () => {
 				EventListener.openImageViewer(image.dataset.path, false);
 			});
+			let tooltipTimer = null;
 			imageContainer.addEventListener("mouseover", () => {
 				const tooltip = image.previousElementSibling;
-				if (!tooltip.classList.contains("tooltip-text")) {
-					throw new Error("DOM element is not of class tooltip-text");
-				}
 				EventListener.showImageMetadata(tooltip, image.dataset.meta);
 			});
+			imageContainer.addEventListener("mousemove", (event) => {
+				const tooltip = image.previousElementSibling;
+				tooltip.style.display = "none";
+				clearTimeout(tooltipTimer);
+				const x = event.clientX;
+				const y = event.clientY;
+				tooltipTimer = setTimeout(() => {
+					tooltip.style.left = (x + 12) + "px";
+					tooltip.style.top = (y + 12) + "px";
+					tooltip.style.display = "block";
+				}, 500);
+			});
 			imageContainer.addEventListener("mouseout", () => {
-				image.previousElementSibling.textContent = "";
+				const tooltip = image.previousElementSibling;
+				clearTimeout(tooltipTimer);
+				tooltipTimer = null;
+				tooltip.style.display = "none";
+				tooltip.textContent = "";
 			});
 
 			if (image.classList.contains("unloaded")) {

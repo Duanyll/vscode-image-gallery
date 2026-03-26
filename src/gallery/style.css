@@ -7,11 +7,15 @@ html {
 	overflow-y: scroll;
 }
 
+:root {
+	--thumbnail-size: 250px;
+}
+
 .grid {
 	display: grid;
 	grid-auto-flow: dense;
-	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-	grid-auto-rows: 250px;
+	grid-template-columns: repeat(auto-fit, minmax(var(--thumbnail-size), 1fr));
+	grid-auto-rows: var(--thumbnail-size);
 	grid-gap: 10px;
 	padding: 10px;
 }
@@ -29,29 +33,19 @@ html {
 }
 
 .tooltip-text {
-	position: absolute;
-	z-index: 100;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	visibility: hidden;
-	opacity: 0;
-	transition: opacity 0.1s;
+	position: fixed;
+	z-index: 10000;
+	display: none;
 	background-color: var(--vscode-editorHoverWidget-background, rgba(37, 37, 38, 0.95));
 	color: var(--vscode-editorHoverWidget-foreground, #cccccc);
-	border-top: 1px solid var(--vscode-editorHoverWidget-border, #454545);
+	border: 1px solid var(--vscode-editorHoverWidget-border, #454545);
 	text-align: left;
 	padding: 4px 8px;
 	font-size: 12px;
 	line-height: 1.5;
 	white-space: pre;
 	pointer-events: none;
-}
-
-.image-container:hover .tooltip-text {
-	opacity: 1;
-	visibility: visible;
-	transition-delay: 0.5s;
+	max-width: 350px;
 }
 
 .image {
@@ -182,6 +176,38 @@ body.vscode-high-contrast .folder-arrow img {
 select option {
 	background-color: var(--vscode-dropdown-listBackground, var(--vscode-dropdown-background, hsl(0, 0%, 23%)));
 	color: var(--vscode-dropdown-foreground, inherit);
+}
+
+.thumbnail-size-control {
+	display: flex;
+	align-items: center;
+	margin-left: 20px;
+	gap: 6px;
+}
+
+.thumbnail-size-control span {
+	font-size: 13px;
+	color: var(--vscode-foreground, inherit);
+	white-space: nowrap;
+}
+
+.thumbnail-slider {
+	width: 80px;
+	height: 4px;
+	-webkit-appearance: none;
+	appearance: none;
+	background: var(--vscode-scrollbarSlider-background, rgba(128, 128, 128, 0.4));
+	border-radius: 2px;
+	outline: none;
+}
+
+.thumbnail-slider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	width: 12px;
+	height: 12px;
+	background: var(--vscode-foreground, #ccc);
+	border-radius: 50%;
+	cursor: pointer;
 }
 
 .refresh-all.refreshing img {
